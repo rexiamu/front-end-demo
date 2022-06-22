@@ -1,22 +1,48 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import HomeView from '../views/HomeView.vue'
+import Layout from "@/layout/index.vue";
+
+const files = require.context('@/views', true, /\.vue$/)
+let pages = {};
+files.keys().forEach(key => {
+  pages[key.replace(/(\.\/|\.vue)/g, '')] = files(key).default;
+})
+//生成路由规则
+let generator = [];
+Object.keys(pages).forEach(item => {
+  if (item != 'home') {
+    generator.push({
+      path: `/${item}`,
+      title: pages[item].title,
+      component: Layout,
+      children: [
+        {
+          path: "",
+          component: () => import(`@/views/${item}`)
+        }
+      ]
+    })
+  }
+});
 
 Vue.use(VueRouter)
 
 const routes = [
   {
     path: '/',
-    name: 'home',
-    component: HomeView
+    component: Layout,
+    title: '首页',
+    children: [
+      {
+        path: "",
+        component: () => import("@/views/home")
+      }
+    ]
   },
+  ...generator,
   {
-    path: '/about',
-    name: 'about',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/AboutView.vue')
+    path: '*',    // 此处需特别注意至于最底部
+    redirect: '/'
   }
 ]
 
