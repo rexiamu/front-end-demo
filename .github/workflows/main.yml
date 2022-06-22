@@ -1,0 +1,30 @@
+name: CI # 部署
+on:
+  push: # 触发事件
+    branches:
+      - master # 指定分支
+
+jobs:
+  main:
+    runs-on: ubuntu-latest # 运行环境
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2 # 检出代码到运行环境
+      with:
+        persist-credentials: false # 是否使用本地git config配置令牌或SSH密钥
+        
+    # 安装依赖
+    - name: Install
+      run: npm install
+    
+    # 打包
+    - name: Build
+      run: npm run build
+     
+    # 部署 pages  
+    - name: Deploy
+      uses: JamesIves/github-pages-deploy-action@releases/v3
+      with:
+        ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }} # 在项目中配置 ACCESS_TOKEN
+        BRANCH: gh-pages
+        FOLDER: dist
