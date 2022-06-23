@@ -13,7 +13,7 @@ Object.keys(pages).forEach(item => {
   if (item != 'home') {
     generator.push({
       path: `/${item}`,
-      title: pages[item].title,
+      title: pages[item].title || '未定义',
       component: Layout,
       children: [
         {
